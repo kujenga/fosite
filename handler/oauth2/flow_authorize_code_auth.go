@@ -73,7 +73,9 @@ func (c *AuthorizeExplicitGrantHandler) IssueAuthorizeCode(ctx context.Context, 
 		return errors.Wrap(fosite.ErrServerError, err.Error())
 	}
 
-	ar.GetSession().SetExpiresAt(fosite.AuthorizeCode, time.Now().Add(c.AuthCodeLifespan))
+	if ar.GetSession().GetExpiresAt(fosite.AuthorizeCode).IsZero() {
+		ar.GetSession().SetExpiresAt(fosite.AuthorizeCode, time.Now().Add(c.AuthCodeLifespan))
+	}
 	if err := c.CoreStorage.CreateAuthorizeCodeSession(ctx, signature, ar); err != nil {
 		return errors.Wrap(fosite.ErrServerError, err.Error())
 	}

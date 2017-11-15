@@ -73,7 +73,9 @@ func (c *RefreshTokenGrantHandler) HandleTokenEndpointRequest(ctx context.Contex
 		request.GrantScope(scope)
 	}
 
-	request.GetSession().SetExpiresAt(fosite.AccessToken, time.Now().Add(c.AccessTokenLifespan))
+	if request.GetSession().GetExpiresAt(fosite.AccessToken).IsZero() {
+		request.GetSession().SetExpiresAt(fosite.AccessToken, time.Now().Add(c.AccessTokenLifespan))
+	}
 	return nil
 }
 

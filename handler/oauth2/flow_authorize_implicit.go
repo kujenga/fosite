@@ -69,7 +69,9 @@ func (c *AuthorizeImplicitGrantTypeHandler) HandleAuthorizeEndpointRequest(ctx c
 }
 
 func (c *AuthorizeImplicitGrantTypeHandler) IssueImplicitAccessToken(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
-	ar.GetSession().SetExpiresAt(fosite.AccessToken, time.Now().Add(c.AccessTokenLifespan))
+	if ar.GetSession().GetExpiresAt(fosite.AccessToken).IsZero() {
+		ar.GetSession().SetExpiresAt(fosite.AccessToken, time.Now().Add(c.AccessTokenLifespan))
+	}
 
 	// Generate the code
 	token, signature, err := c.AccessTokenStrategy.GenerateAccessToken(ctx, ar)

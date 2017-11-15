@@ -75,7 +75,9 @@ func (c *AuthorizeExplicitGrantHandler) HandleTokenEndpointRequest(ctx context.C
 	// client MUST authenticate with the authorization server as described
 	// in Section 3.2.1.
 	request.SetSession(authorizeRequest.GetSession())
-	request.GetSession().SetExpiresAt(fosite.AccessToken, time.Now().Add(c.AccessTokenLifespan))
+	if request.GetSession().GetExpiresAt(fosite.AccessToken).IsZero() {
+		request.GetSession().SetExpiresAt(fosite.AccessToken, time.Now().Add(c.AccessTokenLifespan))
+	}
 	return nil
 }
 
